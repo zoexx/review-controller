@@ -5,14 +5,16 @@
   "type": "module",
   "license": "MIT",
   "bin": {
-    "review-controller": "src/cli.mjs"
+    "review-controller": "src/cli.ts"
   },
   "scripts": {
-    "sync": "node scripts/sync-dictionary.mjs",
-    "review": "node src/cli.mjs",
-    "test": "node test/compile.test.mjs"
+    "sync": "bun run scripts/sync-dictionary.ts",
+    "review": "bun run src/cli.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit"
   },
-  "dependencies": {
-    "js-yaml": "^4.3.0"
+  "devDependencies": {
+    "@types/bun": "^1.3.14",
+    "typescript": "^6.0.3"
   }
 }

@@ -1,7 +1,7 @@
 // Minimal glob matcher — the only "matching" primitive the engine needs.
 // Supports `**` (any path segments), `*` (any run of non-slash), literal rest.
 // Knowledge-free: it matches strings, it knows nothing about review domains.
-export function globToRegExp(glob) {
+export function globToRegExp(glob: string): RegExp {
   let re = '';
   for (let i = 0; i < glob.length; i++) {
     const c = glob[i];
@@ -21,6 +21,6 @@ export function globToRegExp(glob) {
   return new RegExp('^' + re + '$');
 }
 
-export function globMatch(str, glob) {
+export function globMatch(str: string, glob: string): boolean {
   return globToRegExp(glob).test(str);
 }

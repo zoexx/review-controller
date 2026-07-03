@@ -2,12 +2,13 @@
 // review prompt. This is deterministic assembly — the inspectable seam. The prompt
 // it emits is the artifact you debug when a review misses something: term absent =>
 // selection bug here; term present but ignored => a reviewer/model issue.
-import { resolveScope } from './select.mjs';
+import { resolveScope } from './select.ts';
+import type { Context, Dictionary, Profile, Selected, Severity, Tier } from './types.ts';
 
-const SEV = { blocking: 'blocking', important: 'important', nit: 'nit', suggestion: 'suggestion' };
-const oneLine = (x) => String(x ?? '').replace(/\s+/g, ' ').trim();
+const SEV: Record<Severity, string> = { blocking: 'blocking', important: 'important', nit: 'nit', suggestion: 'suggestion' };
+const oneLine = (x: unknown): string => String(x ?? '').replace(/\s+/g, ' ').trim();
 
-function renderTerm({ term }, withExample) {
+function renderTerm({ term }: Selected, withExample: boolean): string {
   const out = [
     `- [${term.id}] ${term.title}`,
     `    smell: ${oneLine(term.smell)}`,
@@ -21,15 +22,21 @@ function renderTerm({ term }, withExample) {
   return out.join('\n');
 }
 
-export function compilePrompt({ dictionary, selected, context, profile }) {
+export function compilePrompt(
+  { dictionary, selected, context, profile }:
+    { dictionary: Dictionary; selected: Selected[]; context: Context; profile: Profile },
+): string {
   const engaged = resolveScope(profile, context);
-  const frames = [dictionary.frames?._base].filter(Boolean);
-  for (const l of engaged) if (dictionary.frames?.[l]) frames.push(dictionary.frames[l]);
+  const frames = [dictionary.frames?._base].filter((f): f is string => Boolean(f));
+  for (const l of engaged) {
+    const frame = dictionary.frames?.[l];
+    if (frame) frames.push(frame);
+  }
 
-  const byTier = { 'always-on': [], default: [], 'context-gated': [] };
+  const byTier: Record<Tier, Selected[]> = { 'always-on': [], default: [], 'context-gated': [] };
   for (const s of selected) byTier[s.tier].push(s);
 
-  const L = [];
+  const L: string[] = [];
   L.push('# Code review — compiled by review-controller');
   L.push(`# profile: ${profile.name} · layers: ${engaged.join('·')} · languages: ${context.languages.join(',') || 'n/a'} · terms: ${selected.length} · dictionary v${dictionary.dictionaryVersion}`);
   L.push('');
@@ -39,7 +46,7 @@ export function compilePrompt({ dictionary, selected, context, profile }) {
   L.push(frames.join('\n\n---\n\n'));
   L.push('');
 
-  const section = (title, arr, withExample) => {
+  const section = (title: string, arr: Selected[], withExample: boolean): void => {
     if (!arr.length) return;
     L.push(`## ${title} (${arr.length})`);
     for (const t of arr) L.push(renderTerm(t, withExample));
