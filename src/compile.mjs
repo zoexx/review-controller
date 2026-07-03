@@ -4,7 +4,7 @@
 // selection bug here; term present but ignored => a reviewer/model issue.
 import { resolveScope } from './select.mjs';
 
-const SEV = { blocking: '🔴 blocking', important: '🟠 important', nit: '🟡 nit', suggestion: '🔵 suggestion' };
+const SEV = { blocking: 'blocking', important: 'important', nit: 'nit', suggestion: 'suggestion' };
 const oneLine = (x) => String(x ?? '').replace(/\s+/g, ' ').trim();
 
 function renderTerm({ term }, withExample) {
@@ -58,6 +58,6 @@ export function compilePrompt({ dictionary, selected, context, profile }) {
   L.push('');
   L.push('## OUTPUT');
   L.push('Emit each finding as: <severity> [layer] file:line — finding. Why: <concrete impact>. Fix: <concrete change>.');
-  L.push('Group findings by severity (blocking first). Close with one verdict: ✅ approve · 💬 approve with comments · 🔁 request changes · ⛔ block.');
+  L.push('Group findings by severity (blocking first). Close with one verdict: approve · approve with comments · request changes · block.');
   return L.join('\n');
 }

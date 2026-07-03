@@ -45,4 +45,4 @@ assert.ok(/## ALWAYS-ON/.test(prompt), 'prompt has an always-on section');
 assert.ok(prompt.includes('[backend.idempotent-retry]'), 'prompt lists the promoted term');
 assert.ok(!prompt.includes('[frontend.layout-shift]'), 'prompt omits out-of-scope term');
 
-console.log('✓ controller select + compile tests pass (4 terms, payments profile)');
+console.log('[ok] controller select + compile tests pass (4 terms, payments profile)');

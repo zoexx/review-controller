@@ -10,9 +10,9 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const src = process.argv[2] || join(ROOT, '..', 'review-dictionary', 'dist', 'dictionary.json');
 
 if (!existsSync(src)) {
-  console.error(`✗ dictionary bundle not found at:\n    ${src}\n  Build it first: (cd ../review-dictionary && npm run build)`);
+  console.error(`[fail] dictionary bundle not found at:\n    ${src}\n  Build it first: (cd ../review-dictionary && npm run build)`);
   process.exit(1);
 }
 mkdirSync(join(ROOT, 'dictionary'), { recursive: true });
 copyFileSync(src, join(ROOT, 'dictionary', 'dictionary.json'));
-console.log(`✓ synced dictionary ← ${src}`);
+console.log(`[ok] synced dictionary ← ${src}`);

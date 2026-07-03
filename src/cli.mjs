@@ -30,7 +30,7 @@ const doRun = has('--run');
 const quiet = has('--quiet');
 
 if (!existsSync(dictPath)) {
-  console.error(`✗ no dictionary bundle at ${dictPath}\n  build it in review-dictionary (npm run build), then: npm run sync`);
+  console.error(`[fail] no dictionary bundle at ${dictPath}\n  build it in review-dictionary (npm run build), then: npm run sync`);
   process.exit(1);
 }
 
