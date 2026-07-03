@@ -1,0 +1,9 @@
+name: default
+# The neutral profile: every term runs at its dictionary default_tier, scoped to
+# the layers the diff actually touches. The floor below is inherited by every
+# profile that `extends: default` — these can never be gated off.
+promote: []
+demote: []
+never_off:
+  - "layer:security"
+  - "domain:data-loss"

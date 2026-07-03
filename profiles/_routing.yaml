@@ -1,0 +1,22 @@
+# Routing data: which layer a changed file implies. The engine only matches globs
+# and extensions against this — it holds no routing logic of its own. Security is
+# additionally always engaged (a light pass) by detect.mjs.
+frontend:
+  ext: [".tsx", ".jsx", ".vue", ".svelte", ".css", ".scss", ".less", ".html", ".astro"]
+  paths: ["**/components/**", "**/pages/**", "**/app/**", "src/**"]
+backend:
+  ext: [".go"]
+  paths: ["**/routes/**", "**/api/**", "**/controllers/**", "**/services/**", "**/handlers/**", "**/middleware/**"]
+database:
+  ext: [".sql", ".prisma"]
+  paths: ["**/migrations/**", "**/models/**", "**/entities/**", "**/repositories/**", "**/schema.rb"]
+security:
+  paths: ["**/auth/**", "**/.env*", "**/package.json", "**/*.lock"]
+mobile:
+  ext: [".swift", ".kt"]
+  paths: ["**/Info.plist", "**/AndroidManifest.xml"]
+infra:
+  ext: [".tf"]
+  paths: ["**/Dockerfile", "**/.github/workflows/**", "**/k8s/**", "**/helm/**"]
+performance:
+  paths: []

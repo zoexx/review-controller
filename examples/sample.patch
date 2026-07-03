@@ -1,0 +1,20 @@
+diff --git a/api/checkout.ts b/api/checkout.ts
+index 1a2b3c4..5d6e7f8 100644
+--- a/api/checkout.ts
++++ b/api/checkout.ts
+@@ -8,6 +8,17 @@ import { stripe } from '../lib/stripe';
+ import { db } from '../lib/db';
+ import { retry } from '../lib/retry';
+
++export async function POST(req: Request) {
++  const { orderId, amount } = await req.json();
++  const total: number = amount * 1.2; // add 20% tax
++
++  // retry the charge on transient failure
++  const charge = await retry(() => stripe.charges.create({ amount: total, currency: 'usd' }), { retries: 3 });
++
++  const order = await db.query(`SELECT * FROM orders WHERE id = ${orderId}`);
++  console.log('charged order', order, 'auth=', req.headers.get('authorization'));
++
++  return Response.json({ ok: true, charge });
++}

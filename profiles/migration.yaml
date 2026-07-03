@@ -1,0 +1,14 @@
+name: migration
+extends: default
+# A schema/migration change against a live table. Locks and rewrites are downtime.
+layers: [database, backend, security]
+promote:
+  - "domain:migration"
+  - "*.lock*"
+  - "*.backfill*"
+  - "*.expand-contract*"
+  - "*.concurrently*"
+  - "*.rewrite*"
+demote:
+  - "domain:a11y"
+  - "domain:seo"

@@ -1,0 +1,15 @@
+name: payments
+extends: default
+# A money-touching change. Look hardest where a bug costs real dollars.
+layers: [backend, database, security, performance]
+promote:
+  - "domain:payments"
+  - "shared.money-type-safety"
+  - "backend.idempotent-retry"
+  - "*.read-modify-write*"
+  - "*.race*"
+  - "*.lost-update*"
+demote:
+  - "domain:observability"
+never_off:
+  - "domain:payments"

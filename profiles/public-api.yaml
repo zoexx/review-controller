@@ -1,0 +1,14 @@
+name: public-api
+extends: default
+# A change to an externally-consumed API. Breaking changes and unbounded responses
+# are the expensive mistakes.
+layers: [backend, security, performance]
+promote:
+  - "domain:api"
+  - "*.breaking-change*"
+  - "*.versioning*"
+  - "*.pagination*"
+  - "*.rate-limit*"
+  - "*.error-envelope*"
+demote:
+  - "domain:observability"

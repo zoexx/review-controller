@@ -1,0 +1,18 @@
+{
+  "name": "review-controller",
+  "version": "0.1.0",
+  "description": "The reviewer engine: selects and prioritizes terms from review-dictionary for a given diff + profile, compiles them into an organized review prompt, and (optionally) runs the review.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "review-controller": "src/cli.mjs"
+  },
+  "scripts": {
+    "sync": "node scripts/sync-dictionary.mjs",
+    "review": "node src/cli.mjs",
+    "test": "node test/compile.test.mjs"
+  },
+  "dependencies": {
+    "js-yaml": "^4.3.0"
+  }
+}
