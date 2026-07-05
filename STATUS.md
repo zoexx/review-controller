@@ -7,7 +7,7 @@ Built 2026-07-03. The reviewer engine over [review-dictionary](../review-diction
 `detect → select → compile → review`, end-to-end, on the 393-term dictionary:
 
 ```
-$ node src/cli.mjs --profile payments --diff examples/sample.patch
+$ bun run src/cli.ts --profile payments --diff examples/sample.patch
 profile=payments  layers=[backend,security]  languages=[ts]  terms=153 (always-on:28 default:107 gated:18)
 compiled prompt → .review/compiled-prompt.md
 ```
@@ -19,7 +19,7 @@ On the sample payment diff, the compiled prompt correctly surfaced every planted
 retry), and `shared.money-type-safety` (`total: number`). The security floor
 (`never_off`) and the cross-layer `shared.*` terms both fired as designed.
 
-- `npm test` — deterministic select+compile unit tests pass.
+- `bun test` — deterministic select+compile unit tests pass.
 - Selection is tiered: `always-on` (safety net) → `default` → `context-gated`. Priority
   steers attention; it never suppresses a finding's severity.
 
@@ -40,7 +40,7 @@ selectors over term ids/domains/layers.
 
 ## Next
 
-- [ ] Wire a real review run: `ANTHROPIC_API_KEY=… node src/cli.mjs … --run` (uses the
+- [ ] Wire a real review run: `ANTHROPIC_API_KEY=… bun run src/cli.ts … --run` (uses the
       Messages API via fetch; defaults to model `claude-opus-4-8`).
 - [ ] Sharpen focus further: filter `default`-tier terms by `applies_when.paths` so a
       153-term prompt shrinks to the genuinely-touched checks. (Tiering already focuses
@@ -49,4 +49,4 @@ selectors over term ids/domains/layers.
 - [ ] Optional LLM-triage compile mode (read the diff → pick/weight terms) alongside the
       current static mode.
 - [ ] Real dictionary pin (git submodule / release artifact) instead of the vendored
-      `dictionary/dictionary.json` copy; refresh today via `npm run sync`.
+      `dictionary/dictionary.json` copy; refresh via `bun run sync`.

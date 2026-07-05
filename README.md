@@ -7,14 +7,14 @@ that into one organized review prompt and (optionally) runs the review.
 ```
 diff / changed files
         │
-   detect.mjs      map paths+extensions → languages + engaged layers   (+ security)
+   detect.ts       map paths+extensions → languages + engaged layers   (+ security)
         │
-   select.mjs      for each dictionary term: in scope? active? at what tier?
+   select.ts       for each dictionary term: in scope? active? at what tier?
         │          profile promotes / demotes / floors; language-focus drops noise
         ▼
-   compile.mjs     frame + terms grouped by tier + the diff  ──►  .review/compiled-prompt.md
+   compile.ts      frame + terms grouped by tier + the diff  ──►  .review/compiled-prompt.md
         │                                                          ▲ the inspectable seam
-   review.mjs      run the prompt against a model → findings + verdict
+   review.ts       run the prompt against a model → findings + verdict
         ▼
    findings                                     (dry-run by default — prints the prompt)
 ```
@@ -55,20 +55,26 @@ emits a finding if violated — priority steers attention, it does not suppress 
 
 ## Use
 
+Requires [Bun](https://bun.sh) (runtime + test runner). **Zero runtime dependencies** —
+YAML is parsed with `Bun.YAML`, and Bun runs the `.ts` sources directly (no build step).
+
 ```bash
-npm install
-npm run sync                 # pin the dictionary bundle from ../review-dictionary/dist
-npm test                     # deterministic select+compile tests
+bun install                  # dev toolchain only (TypeScript types); sources need nothing
+bun run sync                 # pin the dictionary bundle from ../review-dictionary/dist
+bun test                     # deterministic select+compile tests
 
 # compile a review prompt for the sample diff (dry-run prints the prompt):
-node src/cli.mjs --profile payments --diff examples/sample.patch
+bun run src/cli.ts --profile payments --diff examples/sample.patch
 
 # from a real branch diff on stdin:
-git diff main...HEAD | node src/cli.mjs --profile default --diff -
+git diff main...HEAD | bun run src/cli.ts --profile default --diff -
 
 # actually run the review (needs a key; makes one model call):
-ANTHROPIC_API_KEY=sk-... node src/cli.mjs --profile payments --diff examples/sample.patch --run
+ANTHROPIC_API_KEY=sk-... bun run src/cli.ts --profile payments --diff examples/sample.patch --run
 ```
+
+The `bin` is wired too, so `bun run review -- --profile payments --diff examples/sample.patch`
+(or an installed `review-controller`) works the same way.
 
 ### Flags
 
@@ -85,7 +91,7 @@ ANTHROPIC_API_KEY=sk-... node src/cli.mjs --profile payments --diff examples/sam
 ## Relationship to the dictionary
 
 The dictionary is a standalone, shareable knowledge product with its own release
-cadence. This repo **pins** a built bundle (`npm run sync` copies
+cadence. This repo **pins** a built bundle (`bun run sync` copies
 `../review-dictionary/dist/dictionary.json`; in production, pin via git submodule or a
 release artifact). The contract between them is the term schema — the controller reads
 the bundle, never the YAML sources.
