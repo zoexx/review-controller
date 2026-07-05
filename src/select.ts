@@ -26,11 +26,17 @@ const matchesAny = (term: Term, sels: string[] | undefined): boolean =>
 export function resolveScope(profile: Profile, context: Context): Layer[] {
   const detected = context.layers;
   const layers = profile.layers;
+  let scope = detected;
   if (layers && layers.length) {
     const filtered = detected.filter((l) => layers.includes(l));
-    return filtered.length ? filtered : detected;
+    scope = filtered.length ? filtered : detected;
   }
-  return detected;
+  // The security layer always gets its light pass (detect.ts adds it to every
+  // diff); a profile's `layers` filter narrows the other layers but can never
+  // drop security. This makes the security floor a property of SCOPE, not of
+  // never_off — so never_off is free to be a pure within-scope tier floor.
+  if (detected.includes('security') && !scope.includes('security')) scope = [...scope, 'security'];
+  return scope;
 }
 
 export function selectTerms(dictionary: Dictionary, profile: Profile, context: Context): Selected[] {
@@ -38,10 +44,19 @@ export function selectTerms(dictionary: Dictionary, profile: Profile, context: C
   const selected: Array<Selected & { reasons: string[] }> = [];
 
   for (const term of dictionary.terms) {
+    // Layer-scope is the SOLE admission gate: you cannot review a layer the diff
+    // does not touch. never_off is applied *within* scope (it floors the tier
+    // below) — it must not expand scope, or a cross-cutting domain selector
+    // (domain:data-loss, domain:payments) would drag in mobile/infra/database
+    // terms for a diff that never touched those layers, contradicting the
+    // "layers is a filter, never an expander" invariant above.
     const inScope = term.tags.layers.some((l) => scope.includes(l));
-    const forced = matchesAny(term, profile.never_off);
-    if (!inScope && !forced) continue;
+    if (!inScope) continue;
 
+    // forced := this IN-SCOPE term is pinned by never_off; it floors the tier and
+    // exempts the term from the language cull. Computed after admission so it can
+    // never re-admit an out-of-scope term.
+    const forced = matchesAny(term, profile.never_off);
     let tier: Tier = term.default_tier;
     const reasons: string[] = [];
     if (matchesAny(term, profile.demote)) { tier = 'context-gated'; reasons.push('profile:demote'); }

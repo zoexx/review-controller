@@ -9,6 +9,11 @@ promote:
   - "*.read-modify-write*"
   - "*.race*"
   - "*.lost-update*"
+  # secrets-in-logs is natively always-on but is multi-domain (secrets, privacy,
+  # observability), so the observability demote below would otherwise bury a
+  # blocking credential-leak check down in the default tier. promote wins over
+  # demote — a logged secret on a payment path stays in the always-on floor.
+  - "shared.secrets-in-logs"
 demote:
   - "domain:observability"
 never_off:
